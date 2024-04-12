@@ -75,8 +75,8 @@ contract Ownable {
  */
 contract ERC20Basic {
     uint public _totalSupply;
-    function totalSupply() public constant returns (uint);
-    function balanceOf(address who) public constant returns (uint);
+    function totalSupply() public view returns (uint);
+    function balanceOf(address who) public view returns (uint);
     function transfer(address to, uint value) public;
     event Transfer(address indexed from, address indexed to, uint value);
 }
@@ -89,7 +89,7 @@ contract ERC20 is ERC20Basic {
     function allowance(
         address owner,
         address spender
-    ) public constant returns (uint);
+    ) public view returns (uint);
     function transferFrom(address from, address to, uint value) public;
     function approve(address spender, uint value) public;
     event Approval(address indexed owner, address indexed spender, uint value);
@@ -141,7 +141,7 @@ contract BasicToken is Ownable, ERC20Basic {
      * @param _owner The address to query the the balance of.
      * @return An uint representing the amount owned by the passed address.
      */
-    function balanceOf(address _owner) public constant returns (uint balance) {
+    function balanceOf(address _owner) public view returns (uint balance) {
         return balances[_owner];
     }
 }
@@ -169,7 +169,7 @@ contract StandardToken is BasicToken, ERC20 {
         address _to,
         uint _value
     ) public onlyPayloadSize(3 * 32) {
-        var _allowance = allowed[_from][msg.sender];
+        uint _allowance = allowed[_from][msg.sender];
 
         // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
         // if (_value > _allowance) throw;
@@ -219,7 +219,7 @@ contract StandardToken is BasicToken, ERC20 {
     function allowance(
         address _owner,
         address _spender
-    ) public constant returns (uint remaining) {
+    ) public view returns (uint remaining) {
         return allowed[_owner][_spender];
     }
 }
@@ -269,13 +269,11 @@ contract Pausable is Ownable {
 
 contract BlackList is Ownable, BasicToken {
     /////// Getters to allow the same blacklist to be used also by other contracts (including upgraded Tether) ///////
-    function getBlackListStatus(
-        address _maker
-    ) external constant returns (bool) {
+    function getBlackListStatus(address _maker) external view returns (bool) {
         return isBlackListed[_maker];
     }
 
-    function getOwner() external constant returns (address) {
+    function getOwner() external view returns (address) {
         return owner;
     }
 
@@ -383,7 +381,7 @@ contract TetherToken is Pausable, StandardToken, BlackList {
     }
 
     // Forward ERC20 methods to upgraded contract if this one is deprecated
-    function balanceOf(address who) public constant returns (uint) {
+    function balanceOf(address who) public view returns (uint) {
         if (deprecated) {
             return UpgradedStandardToken(upgradedAddress).balanceOf(who);
         } else {
@@ -412,7 +410,7 @@ contract TetherToken is Pausable, StandardToken, BlackList {
     function allowance(
         address _owner,
         address _spender
-    ) public constant returns (uint remaining) {
+    ) public view returns (uint remaining) {
         if (deprecated) {
             return StandardToken(upgradedAddress).allowance(_owner, _spender);
         } else {
@@ -428,7 +426,7 @@ contract TetherToken is Pausable, StandardToken, BlackList {
     }
 
     // deprecate current contract if favour of a new one
-    function totalSupply() public constant returns (uint) {
+    function totalSupply() public view returns (uint) {
         if (deprecated) {
             return StandardToken(upgradedAddress).totalSupply();
         } else {
@@ -961,7 +959,7 @@ contract ERC20 is IERC20 {
 
 // File: https://github.com/erasureprotocol/erasure-protocol/blob/v1.2.0/contracts/modules/Spawner.sol
 
-pragma solidity ^0.8.25;
+pragma solidity ^0.5.16;
 
 /// @title Spawn
 /// @author 0age (@0age) for Numerai Inc
@@ -1375,7 +1373,7 @@ contract ERC20Detailed is IERC20 {
 
 // File: browser/FlashToken.sol
 
-pragma solidity ^0.8.25;
+pragma solidity ^0.5.16;
 
 /// @title FlashToken
 /// @author Stephane Gosselin (@thegostep), Austin Williams (@Austin-Williams)
@@ -1417,13 +1415,13 @@ contract FlashToken is ERC20 {
 
     /// @notice Get the address of the factory for this clone.
     /// @return factory address of the factory.
-    function getFactory() public view returns (address factory) {
+    function getFactory() public constant returns (address factory) {
         return _factory;
     }
 
     /// @notice Get the address of the base token for this clone.
     /// @return factory address of the base token.
-    function getBaseToken() public view returns (address baseToken) {
+    function getBaseToken() public constant returns (address baseToken) {
         return address(_baseToken);
     }
 

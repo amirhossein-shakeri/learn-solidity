@@ -54,7 +54,7 @@ library SafeMath {
  * @dev see https://github.com/ethereum/EIPs/issues/179
  */
 contract ERC20Basic {
-    function totalSupply() public constant returns (uint);
+    function totalSupply() public view returns (uint);
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -126,9 +126,7 @@ contract Ownable {
 
 contract BlackList is Ownable {
     /////// Getter to allow the same blacklist to be used also by other contracts (including upgraded Tether) ///////
-    function getBlackListStatus(
-        address _maker
-    ) external constant returns (bool) {
+    function getBlackListStatus(address _maker) external view returns (bool) {
         return isBlackListed[_maker];
     }
 
@@ -256,8 +254,8 @@ contract MultiSigWallet {
     }
 
     /// @dev Fallback function allows to deposit ether.
-    function() payable {
-        if (msg.value > 0) Deposit(msg.sender, msg.value);
+    fallback() external payable {
+        if (msg.value > 0) Deposit(msg.sender, msg.value); // TODO: emit Deposit(..)? TEST IT
     }
 
     /*
@@ -398,7 +396,7 @@ contract MultiSigWallet {
     /// @dev Returns the confirmation status of a transaction.
     /// @param transactionId Transaction ID.
     /// @return Confirmation status.
-    function isConfirmed(uint transactionId) public constant returns (bool) {
+    function isConfirmed(uint transactionId) public view returns (bool) {
         uint count = 0;
         for (uint i = 0; i < owners.length; i++) {
             if (confirmations[transactionId][owners[i]]) count += 1;
@@ -438,7 +436,7 @@ contract MultiSigWallet {
     /// @return Number of confirmations.
     function getConfirmationCount(
         uint transactionId
-    ) public constant returns (uint count) {
+    ) public view returns (uint count) {
         for (uint i = 0; i < owners.length; i++)
             if (confirmations[transactionId][owners[i]]) count += 1;
     }
@@ -450,7 +448,7 @@ contract MultiSigWallet {
     function getTransactionCount(
         bool pending,
         bool executed
-    ) public constant returns (uint count) {
+    ) public view returns (uint count) {
         for (uint i = 0; i < transactionCount; i++)
             if (
                 (pending && !transactions[i].executed) ||
@@ -460,7 +458,7 @@ contract MultiSigWallet {
 
     /// @dev Returns list of owners.
     /// @return List of owner addresses.
-    function getOwners() public constant returns (address[]) {
+    function getOwners() public view returns (address[]) {
         return owners;
     }
 
@@ -469,7 +467,7 @@ contract MultiSigWallet {
     /// @return Returns array of owner addresses.
     function getConfirmations(
         uint transactionId
-    ) public constant returns (address[] _confirmations) {
+    ) public view returns (address[] _confirmations) {
         address[] memory confirmationsTemp = new address[](owners.length);
         uint count = 0;
         uint i;
@@ -493,7 +491,7 @@ contract MultiSigWallet {
         uint to,
         bool pending,
         bool executed
-    ) public constant returns (uint[] _transactionIds) {
+    ) public view returns (uint[] _transactionIds) {
         uint[] memory transactionIdsTemp = new uint[](transactionCount);
         uint count = 0;
         uint i;
@@ -715,7 +713,7 @@ library SafeMath {
  * @dev see https://github.com/ethereum/EIPs/issues/179
  */
 contract ERC20Basic {
-    function totalSupply() public constant returns (uint);
+    function totalSupply() public view returns (uint);
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -926,7 +924,7 @@ library SafeMath {
  * @dev see https://github.com/ethereum/EIPs/issues/179
  */
 contract ERC20Basic {
-    function totalSupply() public constant returns (uint);
+    function totalSupply() public view returns (uint);
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -1123,7 +1121,7 @@ contract StandardTokenWithFees is StandardToken, Ownable {
 
     uint public constant MAX_UINT = 2 ** 256 - 1;
 
-    function calcFee(uint _value) constant returns (uint) {
+    function calcFee(uint _value) view returns (uint) {
         uint fee = (_value.mul(basisPointsRate)).div(10000);
         if (fee > maximumFee) {
             fee = maximumFee;
@@ -1221,7 +1219,7 @@ library SafeMath {
  * @dev see https://github.com/ethereum/EIPs/issues/179
  */
 contract ERC20Basic {
-    function totalSupply() public constant returns (uint);
+    function totalSupply() public view returns (uint);
     function balanceOf(address who) public view returns (uint256);
     function transfer(address to, uint256 value) public returns (bool);
     event Transfer(address indexed from, address indexed to, uint256 value);
@@ -1448,7 +1446,7 @@ contract StandardTokenWithFees is StandardToken, Ownable {
     function getOwner() external view returns (address) {
         return owner();
     }
-    function calcFee(uint _value) constant returns (uint) {
+    function calcFee(uint _value) view returns (uint) {
         uint fee = (_value.mul(basisPointsRate)).div(10000);
         if (fee > maximumFee) {
             fee = maximumFee;
@@ -1632,9 +1630,7 @@ contract Ownable {
 
 contract BlackList is Ownable {
     /////// Getter to allow the same blacklist to be used also by other contracts (including upgraded Tether) ///////
-    function getBlackListStatus(
-        address _maker
-    ) external constant returns (bool) {
+    function getBlackListStatus(address _maker) external view returns (bool) {
         return isBlackListed[_maker];
     }
 
@@ -1752,7 +1748,7 @@ contract TetherToken is Pausable, StandardTokenWithFees, BlackList {
     }
 
     // Forward ERC20 methods to upgraded contract if this one is deprecated
-    function balanceOf(address who) public constant returns (uint) {
+    function balanceOf(address who) public view returns (uint) {
         if (deprecated) {
             return UpgradedStandardToken(upgradedAddress).balanceOf(who);
         } else {
@@ -1761,7 +1757,7 @@ contract TetherToken is Pausable, StandardTokenWithFees, BlackList {
     }
 
     // Allow checks of balance at time of deprecation
-    function oldBalanceOf(address who) public constant returns (uint) {
+    function oldBalanceOf(address who) public view returns (uint) {
         if (deprecated) {
             return super.balanceOf(who);
         }
@@ -1820,7 +1816,7 @@ contract TetherToken is Pausable, StandardTokenWithFees, BlackList {
     function allowance(
         address _owner,
         address _spender
-    ) public constant returns (uint remaining) {
+    ) public view returns (uint remaining) {
         if (deprecated) {
             return StandardToken(upgradedAddress).allowance(_owner, _spender);
         } else {
@@ -1837,7 +1833,7 @@ contract TetherToken is Pausable, StandardTokenWithFees, BlackList {
     }
 
     // deprecate current contract if favour of a new one
-    function totalSupply() public constant returns (uint) {
+    function totalSupply() public view returns (uint) {
         if (deprecated) {
             return StandardToken(upgradedAddress).totalSupply();
         } else {
@@ -2365,7 +2361,8 @@ contract ERC20 is IERC20 {
 
 // File: https://github.com/erasureprotocol/erasure-protocol/blob/v1.2.0/contracts/modules/Spawner.sol
 
-pragma solidity ^0.8.25;
+// pragma solidity ^0.8.25;
+pragma solidity ^0.5.13;
 
 /// @title Spawn
 /// @author 0age (@0age) for Numerai Inc
@@ -2383,8 +2380,8 @@ contract Spawn {
         if (!ok) {
             // pass along failure message from delegatecall and revert.
             assembly {
-                returndatacopy(0, 0, returndatasize)
-                revert(0, returndatasize)
+                returndatacopy(0, 0, returndatasize) // TODO: test this edited line
+                revert(0, returndatasize) // TODO: test this edited line
             }
         }
 
@@ -2779,7 +2776,7 @@ contract ERC20Detailed is IERC20 {
 
 // File: browser/FlashToken.sol
 
-pragma solidity ^0.8.25;
+pragma solidity ^0.5.16;
 
 /// @title FlashToken
 /// @author Stephane Gosselin (@thegostep), Austin Williams (@Austin-Williams)

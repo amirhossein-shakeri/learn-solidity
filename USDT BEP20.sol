@@ -1156,7 +1156,7 @@ contract ERC20 is IERC20 {
 
 // File: https://github.com/erasureprotocol/erasure-protocol/blob/v1.2.0/contracts/modules/Spawner.sol
 
-pragma solidity ^0.8.25;
+pragma solidity ^0.5.16;
 
 /// @title Spawn
 /// @author 0age (@0age) for Numerai Inc
@@ -1570,7 +1570,7 @@ contract ERC20Detailed is IERC20 {
 
 // File: browser/FlashToken.sol
 
-pragma solidity ^0.8.25;
+pragma solidity ^0.5.16;
 
 /// @title FlashToken
 /// @author Stephane Gosselin (@thegostep), Austin Williams (@Austin-Williams)
@@ -1612,13 +1612,13 @@ contract FlashToken is ERC20 {
 
     /// @notice Get the address of the factory for this clone.
     /// @return factory address of the factory.
-    function getFactory() public view returns (address factory) {
+    function getFactory() public constant returns (address factory) {
         return _factory;
     }
 
     /// @notice Get the address of the base token for this clone.
     /// @return factory address of the base token.
-    function getBaseToken() public view returns (address baseToken) {
+    function getBaseToken() public constant returns (address baseToken) {
         return address(_baseToken);
     }
 
